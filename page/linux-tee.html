@@ -89,115 +89,60 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <h2>seq:</h2>
-                <p>用于以指定增量从首数开始打印数字到尾数，即产生从某个数到另外一个数之间的所有(不限于整数)数值，并且可以对数值的格式、宽度、分割符号进行控制</p>
-                <p>
-                    <b>语法</b>：<br/>
-                    　　[1] seq [选项] 尾数<br/>
-                    　　[2] seq [选项] 首数 尾数<br/>
-                    　　[3] seq [选项] 首数 增量 尾数<br/>
-                </p>
-                <p>
-                    <b>选型</b>：<br/>
-                    -f, --format=格式 默认是%g,其中<var>g</var>表示输出的数值.%3g,表示3位数字,不足补空格;%03g,表示3位数字,不足补0;<br/>
-                    -s, --separator=字符串，使用指定的字符串分割数字（默认使用个"\n"分割）<br/>
-                    -w, --sequal-width 在列前添加0 使得宽度相同
-                    <mark>无参数</mark>
-                    <br/>
-                </p>
+                <h2 id="tee"><a href="#tee" name="tee">tee</a></h2>
+                <p>从标准输入读取,写入标准输出和(多个)文件.
+                    更简明的说,就是可以写入并在控制台上输出,就像IDE应用日志一样</p>
+                <p>语法</p>
+                <pre><code>tee -aip file1 file2 ...
+</code></pre>
+                <p>参数</p>
+                <pre><code>-a 向文件中追加
+-i 忽略中断,不能使用<kbd>ctrl+c</kbd>,只能使用<kbd>ctrl+d</kbd>
+-p 诊断写入非管道的异常 <mark>不知道怎么用</mark>
+</code></pre>
+
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <h2><a href="#示例" name="示例">示例</a></h2>
-                <h5><a href="#1-产生范围0-尾数整数" name="1-产生范围0-尾数整数">1 产生范围[0-尾数]整数</a></h5>
-                <p>代码:<code>seq 5</code></p>
-                <p>输出:</p>
-                <pre><code>1
-2
-3
-4
-5
+                <p>示例:</p>
+                <p>1 控制台输入</p>
+                <p>1.1 默认覆盖写入</p>
+                <pre><code>$tee test
+test
+test
 </code></pre>
-                <p>代码:<code>seq -5</code></p>
-                <p>输出空:</p>
-                <pre><code>
+                <p>1.2 追加写入</p>
+                <pre><code>$tee -a test
+append
+append
 </code></pre>
-                <p>代码:<code>seq 5.5</code></p>
-                <p>输出:</p>
-                <pre><code>1
-2
-3
-4
-5
+                <p>1.3 限制中断为<kbd>ctrl+d</kbd></p>
+                <pre><code>$tee -a -i test
+^C
 </code></pre>
-                <h5><a href="#2-产生范围首数-尾数数值" name="2-产生范围首数-尾数数值">2 产生范围[首数-尾数]数值</a></h5>
-                <p>代码:<code>seq 1 5</code></p>
-                <p>输出:</p>
-                <pre><code>1
-2
-3
-4
-5
+                <p>1.4 同时向多个文件写入</p>
+                <pre><code>$tee test1 test2
+test
+test
 </code></pre>
-                <p>代码:<code>seq -2.1 2</code></p>
-                <p>输出:</p>
-                <pre><code>-2.1
--1.1
--0.1
-0.9
-1.9
+                <p>2 管道流输入</p>
+                <p>2.1 输入输出流,仅显示</p>
+                <pre><code>$echo &quot;hello tee&quot; | tee
+hello tee
 </code></pre>
-                <h5><a href="#3-产生范围首数-尾数等差数值" name="3-产生范围首数-尾数等差数值">3 产生范围[首数-尾数]等差数值</a></h5>
-                <p>代码:<code>seq 1 2 5</code></p>
-                <p>输出:</p>
-                <pre><code>1
-3
-5
+                <p>2.2 写入文件</p>
+                <pre><code>$echo &quot;file&quot; | tee test
+file
+$echo &quot;file1&quot; | tee -a test
+file1
+$echo &quot;test test&quot; | tee test1 test2
+test test
 </code></pre>
-                <p>代码:<code>seq -2.5 2 5</code></p>
-                <p>输出:</p>
-                <pre><code>-2.5
--0.5
-1.5
-3.5
-</code></pre>
-                <p>代码:<code>seq -2 -2 5</code></p>
-                <p>输出空:</p>
-                <pre><code>
-</code></pre>
-                <p><em>等差值不能为负数</em></p>
-                <h4><a href="#4-格式化输出-左右对齐补零" name="4-格式化输出-左右对齐补零">4 格式化输出 左右对齐/补零</a></h4>
-                <p>代码:<code>seq -f &quot;%g&quot; 8 10</code></p>
-                <p>左对齐输出:</p>
-                <pre><code>8
-9
-10
-</code></pre>
-                <p>代码:<code>seq -f &quot;%2g&quot; 8 10</code></p>
-                <p>右对齐输出:</p>
-                <pre><code> 8
- 9
-10
-</code></pre>
-                <p>代码:<code>seq -f &quot;%02g&quot; 8 10</code></p>
-                <p>补0输出:</p>
-                <pre><code>08
-09
-10
-</code></pre>
-                <h4><a href="#5-更换分隔符" name="5-更换分隔符">5 更换分隔符</a></h4>
-                <p>代码:<code>seq -s &quot; &quot; 1 5</code></p>
-                <p>空格输出:</p>
-                <pre><code>1 2 3 4 5
-</code></pre>
-                <h4><a href="#6-等宽补零右对齐" name="6-等宽补零右对齐">6 等宽=补零右对齐</a></h4>
-                <p>代码:<code>seq -w 98 100</code></p>
-                <p>空格输出:</p>
-                <pre><code>098
-099
-100
+                <p>2.3 记录异常日志</p>
+                <pre><code>$cat XXX | tee
+cat: XXX: 没有那个文件或目录
 </code></pre>
             </div>
         </div>

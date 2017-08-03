@@ -37,7 +37,7 @@
     <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
         <div class="container-fluid">
             <!-- Brand and toggle get grouped for better mobile display -->
-            <div class="navbar-header page-scroll">
+            <div id="top" class="navbar-header page-scroll">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                     <span class="sr-only">Toggle navigation</span>
                     Menu <i class="fa fa-bars"></i>
@@ -54,8 +54,17 @@
                     <li>
                         <a href="linux.html">Linux/Ubuntu</a>
                     </li>
-                    <li>
-                        <a href="post.html">Sample Post</a>
+                    <li role="presentation" class="dropdown">
+                        <a class="dropdown-toggle" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            系统架构 <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="#">html</a></li>
+                            <li><a href="#">css</a></li>
+                            <li><a href="#">js</a></li>
+                            <li role="separator" class="divider"></li>
+                            <li><a href="#">消息中间件</a></li>
+                        </ul>
                     </li>
                     <li>
                         <a href="contact.html">Contact</a>
@@ -85,12 +94,7 @@
 
     <!-- Main Content -->
     <div class="container">
-        <a href="https://github.com/FansinZhao/FansinZhao.github.io"  data-spy="affix">
-            <span class="fa-stack fa-lg">
-                <i class="fa fa-circle fa-stack-2x"></i>
-                <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-            </span>
-        </a>
+
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <div class="post-preview">
@@ -111,33 +115,51 @@
                         <h2 class="post-title">
                             <span class="label label-default">Linux</span>命令:seq 序列命令
                         </h2>
+                        <h3 class="post-subtitle">
+                            可以方便生成等差数组
+                        </h3>
                     </a>
                     <p class="post-meta"><a href="#">FansinZhao</a> 发表于 2017-07-25</p>
-                    <p><span class="label label-info">linux</span>,<span class="label label-info">seq</span></p>
+                    <p><span class="label label-info">linux</span><span class="label label-info">seq</span></p>
                 </div>
                 <hr>
                 <div class="post-preview">
-                    <a href="post.html">
+                    <a href="page/linux-tee.html">
                         <h2 class="post-title">
-                            Science has not yet mastered prophecy
+                            <span class="label label-default">Linux</span>命令:tee 输出流命令
                         </h2>
                         <h3 class="post-subtitle">
-                            We predict too much for the next year and yet far too little for the next ten.
+                            可以同时将记录写入文件并显示在输出流中,类似IDE的控制台
                         </h3>
                     </a>
-                    <p class="post-meta">Posted by <a href="#">Start Bootstrap</a> on August 24, 2014</p>
+                    <p class="post-meta"><a href="#">FansinZhao</a> 发表于 2017-07-26</p>
+                    <p><span class="label label-info">linux</span><span class="label label-info">tee</span></p>
                 </div>
                 <hr>
                 <div class="post-preview">
-                    <a href="post.html">
+                    <a href="page/linux-rabbitmq-install.html">
                         <h2 class="post-title">
-                            Failure is not an option
+                            <span class="label label-success">消息中间件</span>RabbitMQ安装教程:
                         </h2>
                         <h3 class="post-subtitle">
-                            Many say exploration is part of our destiny, but it’s actually our duty to future generations.
+                            根据rabbitmq的官方文档简单安装和配置,如果平时开发使用,还可以使用docker,`docker search rabbitmq`查找镜像.
                         </h3>
                     </a>
-                    <p class="post-meta">Posted by <a href="#">Start Bootstrap</a> on July 8, 2014</p>
+                    <p class="post-meta"><a href="#">FansinZhao</a> 发表于 2017-08-03</p>
+                    <p><span class="label label-info">消息中间件</span><span class="label label-info">rabbitmq</span></p>
+                </div>
+                <hr>
+                <div class="post-preview">
+                    <a href="page/linux-rabbitmq-offical.html">
+                        <h2 class="post-title">
+                            <span class="label label-success">消息中间件</span>RabbitMQ基本消息队列使用:
+                        </h2>
+                        <h3 class="post-subtitle">
+                            根据rabbitmq的官方demo,结合自己的理解,对rabbitmq的简单应用示例.
+                        </h3>
+                    </a>
+                    <p class="post-meta"><a href="#">FansinZhao</a> 发表于 2017-08-03</p>
+                    <p><span class="label label-info">消息中间件</span><span class="label label-info">rabbitmq</span></p>
                 </div>
                 <hr>
                 <!-- Pager -->
@@ -146,6 +168,14 @@
                         <a href="#">历史博客 &rarr;</a>
                     </li>
                 </ul>
+            </div>
+            <div class="col-lg-2 col-md-1 text-right">
+                <a href="https://github.com/FansinZhao/FansinZhao.github.io"  data-spy="affix">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                </span>
+                </a>
             </div>
         </div>
     </div>
