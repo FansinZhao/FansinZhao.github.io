@@ -281,16 +281,94 @@ rabbitmq默认配置virtual host 为 "/", exchange默认AMQP default,没有默�
         e.printStackTrace();
     }
 
-# 非官方 5不常用的exchange headers 类似主题+订阅模式结合
+# 官方文档 5 使用mq来实现rpc
+在分布式环境中,远程调用rpc有很多实现方式,比较流行的,非跨语言速度极快的java RMI,
+google的基于protobuf/http2的GRPC ,facebook的IO多路复用/tcp的Thrift,使用WSDL的Web Service等.
+MQ同样也可以做RPC实现,这源于MQ的天然负载均衡,以及rpc的非实时性要求.
+使用rabbitmq实现rpc,用到了三点,第一是connection属性的BasicProperties,需要设置一个
+应答队列replyTo,这个是在publish时带入的;第二 使用默认exchange,不需要设定exchange;
+第三,应答队列的属性应当是排他自动删除的,这个使用默认无数方法生成的队列就可以,默认为排他,
+自动删除,非持久队列.关于这点,可以看源码:
+
+AutorecoveringChannel.java
+
+    @Override
+    public AMQP.Queue.DeclareOk queueDeclare() throws IOException {
+        return queueDeclare("", false, true, true, null);
+    }
+
+下面是rpc服务端代码
+
+    try {
+        Connection connection = factory.newConnection();
+        Channel channel = connection.createChannel();
+        channel.basicQos(1);
+        channel.queueDeclare(REQUEST_QUEUE,false,false,true,null);
+        System.out.println("RPC 服务器等待....");
+        channel.basicConsume(REQUEST_QUEUE,false,new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                String replyQueue = properties.getReplyTo();
+                AMQP.BasicProperties replyProp = new AMQP.BasicProperties().builder().correlationId(properties.getCorrelationId()).build();
+                String message = new String(body);
+                int n = Integer.parseInt(message);
+                String responseBody =String.valueOf(fibonacci(n));
+                channel.basicPublish("",replyQueue,replyProp,responseBody.getBytes());
+                channel.basicAck(envelope.getDeliveryTag(),false);
+                System.out.println("计算 Fibonacci ["+message+"] = "+responseBody);
+            }
+        });
+        latch.countDown();
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (TimeoutException e) {
+        e.printStackTrace();
+    }
+    private int fibonacci(int value){
+        if(value == 0 || value == 1){
+            return value;
+        }else {
+            return fibonacci(value-1)+fibonacci(value-2);
+        }
+    }
+
+下面是rpc客户端代码,注意看没有设置exchange,队列也是使用默认的queueDeclare()
+
+    try {
+        Connection connection = factory.newConnection();
+        Channel channel = connection.createChannel();
+        //声明应答队列,默认是排他,自动删除,非持久队列,也就是说,当客户端停止了,队列就好消失
+        String queueName = channel.queueDeclare().getQueue();
+        String correlationId = UUID.randomUUID().toString();
+        AMQP.BasicProperties properties = new AMQP.BasicProperties().builder().correlationId(correlationId).replyTo(queueName).build();
+        channel.basicPublish("",REQUEST_QUEUE,properties,message.getBytes());
+        BlockingQueue<String> response = new ArrayBlockingQueue<String>(1);
+        channel.basicConsume(queueName,true,new DefaultConsumer(channel){
+            @Override
+            public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
+                if (correlationId.equalsIgnoreCase(properties.getCorrelationId())){
+                    response.offer(new String(body));
+                }
+            }
+        });
+        System.out.println("接收到消息:"+response.take());
+    } catch (IOException e) {
+        e.printStackTrace();
+    } catch (TimeoutException e) {
+        e.printStackTrace();
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+
+
+# 非官方 6 被抛弃冷落的direct同胞兄弟headers 类似主题+订阅模式结合
 上面的例子都是使用routingkey来进行绑定关系,在一些情况下,可能还是不能满足业务场景,
 比如我想要"张三",电话"123456789"的所有消息,转到一个特殊处理(仅举例,无意义).
 
 [消费端代码](http://dwz.cn/6lr8dv),同样是创建一个exchange,类型headers,然后构建一个map,通过BasicProperties,
 传递参数.注意这里的map的value可以为java的一些基本类型(可以查阅`Frame.fieldValueSize()`),
-但是不能是用户自定义的类型.
-在现在的很多流行框架中,"客户端"会做很多事情,比如我们把创建exchange和queue的任务交给客户端,
-现在我们把验证格式("x-match","all")也放在客户端,个人认为,这是一种给服务端减压的趋势,
-将服务端压力分散到使用者那里.
+但是不能是用户自定义的类型.rabbitmq对于不存在queue,发送的消息会丢失,所以从消息持久化的角度,
+服务端和客户端都应当declare,但是只有消费端declare,并不会报错,如果消息比客户端启动更早到达,则会丢失消息.
 
 我做了一个测试,any可以有多个,正常接收消息,类似订阅模式fanout,但是注意all只能有一个接收.
 
@@ -353,7 +431,7 @@ rabbitmq默认配置virtual host 为 "/", exchange默认AMQP default,没有默�
     System.out.println("服务端启动.");
 
 
-# 非官方 6 事务
+# 非官方 7 事务
 事务几乎无处不在,而现在谈及事务绝不是简单的事务,而是分布式事务.遗憾的是这里的事务跟分布式事务没有必然联系.
 这里单纯的谈及rabbitmq的事务.首先说一下,rabbitmq是基于tcp协议的,tcp三次握手四次挥手,这里就涉及到消息的确认
 机制.而rabbitmq的事务也是依赖这个确认机制的.再来说一下确认机制,我们在使用rabbitmq或者jms默认都是
@@ -438,6 +516,7 @@ rabbitmq提供了一个高级的Publisher Confirm机制,跟传统不太一样,�
                     @Override
                     public void handleDelivery(String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body) throws IOException {
                         String msg = new String(body);
+                        channel.basicAck(envelope.getDeliveryTag(),false);
                         if (msg.equalsIgnoreCase("end")){
                             long end = System.currentTimeMillis();
                             System.out.println("[接收方]接收完毕"+(end-start));
@@ -451,7 +530,7 @@ rabbitmq提供了一个高级的Publisher Confirm机制,跟传统不太一样,�
                     }
                 };
                 //手动ack
-                channel.basicConsume(NO_TRANSACTION, true, consumer);
+                channel.basicConsume(NO_TRANSACTION, false, consumer);
                 System.out.println("[接收方]客户端等待中......");
                 latch.countDown();
             } catch (TimeoutException e) {
@@ -465,8 +544,8 @@ rabbitmq提供了一个高级的Publisher Confirm机制,跟传统不太一样,�
 输出:
 
     [接收方]客户端等待中......
-    [发送方]发送方耗时:3863
-    [接收方]接收完毕4364
+    [发送方]发送方耗时:4080
+    [接收方]接收完毕16904
 
 
 [事务消息代码](http://dwz.cn/6lD4ad)
@@ -718,7 +797,7 @@ rabbitmq提供了一个高级的Publisher Confirm机制,跟传统不太一样,�
 
 10w简单消息发送时间
 
-无事务:4s左右
+无事务:15s左右
 
 tx事务:20s左右
 
