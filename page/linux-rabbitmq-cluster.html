@@ -91,7 +91,7 @@
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <textarea markdown-data cols="60" rows="5" style="display: none"  >
 
-4 单机集群(跟多主机集群类似)
+# 单机集群(跟多主机集群类似)
 
 首先过一下rabbitmqctl提供的方法
 
@@ -233,7 +233,7 @@ forget_cluster_node:集群中在线的节点,将已下线的节点移除集群,�
     {cluster_name,<<"rabbit-cluster">>},
     ...
 
-5 多机器(真机)集群
+# 多机器(真机)集群
 
 第一点 注意erlang-cookie要保持一致.
 cookie 存放的位置在:
@@ -313,7 +313,7 @@ rabbitmq依赖的是主机名,所以还要在`/etc/hosts`添加其他节点主�
 
 
 
-6 其他的分布式方式
+# 其他的分布式方式
 
 官方还提供了一种Federation / Shovel的方式,这是一种转发的机制,消息可以发我其他的服务节点.
 
