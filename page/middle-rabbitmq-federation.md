@@ -6,18 +6,18 @@
 amqp协议传输消息,由于是遵循协议,所以节点之间的版本可以不同,不想原生集群那么多限制.
 绑定关系,通过设定parameter和policy关联集群.
 
+特性:
+
+1. 松耦合 不限制vhost,user甚至erlang/rabbitmq的版本
+2. 网络友好 不限制网络范围,遵循amqp协议即可
+3. 自定义集群 可以自定义集群方式
+4. 可扩展性 不必两两互联,可以单向传输
+
 我使用docker创建两个容器
 
     docker run -d --hostname my-rabbit-cluster-federation --name my-rabbit-cluster-federation -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+
     docker run -d  --link my-rabbit-cluster-federation --hostname my-rabbit-cluster-federation-1 --name my-rabbit-cluster-federation-1 -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
-
-<!-- 第一步 创建一个vhost,`注意vhost不能带有'/'`,并添加至少一个用户
-
-    rabbitmqctl add_user rabbit rabbit
-    rabbitmqctl set_user_tags rabbit administrator
-    rabbitmqctl authenticate_user rabbit rabbit
-    rabbitmqctl add_vhost my-vhost
-    rabbitmqctl set_permissions -p my-vhost rabbit '.*' '.*' '.*' -->
 
 第一步启动插件 启动每个节点的插件
 
@@ -31,23 +31,29 @@ amqp协议传输消息,由于是遵循协议,所以节点之间的版本可以�
 
 第三步 `downstream节点`  设置集群内容 设置/清除策略,用来确定加入集群exchange,无法加载""空exchange
 
-    rabbitmqctl set_policy --apply-to queues federate-me "^queue\." '{"federation-upstream-set":"all"}'
 
-    rabbitmqctl clear_policy federate-me
+    rabbitmqctl set_policy --apply-to all federate-all "^fed\." '{"federation-upstream-set":"all"}'
+
+    rabbitmqctl clear_policy federate-all
+
+单独设置exchange 或 queue
+
+    rabbitmqctl set_policy --apply-to queues federate-queue "^queue\." '{"federation-upstream-set":"all"}'
+
+    rabbitmqctl set_policy --apply-to exchanges federate-exchange "^exchange\." '{"federation-upstream-set":"all"}'
+
 
 第四步验证集群
 
 现在看my-rabbit-cluster-federation的集群会看到多个连接,然后再看
-my-rabbit-cluster-federation-1也会看到多个连接,同时exchange上会有"federate-me"
+my-rabbit-cluster-federation-1也会看到多个连接,同时exchange上会有"federate-all"
 特性.
-通过federation可以实现exchange或者queue的高可用.测试中发现,无法实现消息复制功能.
-当downstream启动客户端时,可以发送消息,证实队列正常创建,但是无消息.
-federation经常同shovel一块使用,实现消息复制.
 
-*注意:我测试代码的时候,发现exchange一直无法使用,不知道问什么,有知道的朋友告知一下*
 
 [代码测试用例](http://dwz.cn/6orLGq)
 
+建议先创建好queue或者exchange,如果不提前创建,代码第一次启动会报错.第二次就正常了.
+队列默认创建的是durable的exchange或者queue,如果遇到durable的问题,需要重新删掉对应的exchange或者queue,重新创建.
 
 
 再次贴一下与[原生集群](https://fansinzhao.github.io/page/linux-rabbitmq-cluster.html)的区别:
@@ -69,26 +75,76 @@ exchange可以有单独的信息,有些消息是本地的|每个节点的消息�
 
 ![无法正常显示markdown表格](image/rabbitmq-distribute.png)
 
+## Federation的高级用法
 
-# Federation搭档Shovel
+官网介绍了提供了5种基本集群格式:
 
-shovel跟federation使用类似,比federation更加的灵活,federation用在局域网,而shovel
-可以用在互联网中.
+1 基本集群方式,这个是单向的集群
+
+![](http://www.rabbitmq.com/img/federation01.png)
+
+2 两节点相互federation,默认参数`max_hops=1`不需要特殊设置
+
+![](http://www.rabbitmq.com/img/federation02.png)
+
+3 三节点两两federation,上面的节点+1,默认参数`max_hops=1`不需要特殊设置
+
+![](http://www.rabbitmq.com/img/federation03.png) 
+
+4 扇出(p/s订阅)树型 跟fanout的exchange类似功能, 注意设置参数`max_hops=0`,
+如果确定树的深度,max_hops应当大于等于树的深度
+
+![](http://www.rabbitmq.com/img/federation04.png)
+
+5 环形 参数设置为`max_hops=5` 有一点,一旦环中一个节点down,整个环也就断了.
+
+![](http://www.rabbitmq.com/img/federation05.png)
+
+# 比Federation更灵活的Shovel
+
+shovel跟federation使用类似,但使用的是erlang client,更底层,更多配置,也更灵活.
+默认使用动态配置,关于静态配置请详看[官网shovel](http://www.rabbitmq.com/shovel.html)
+
+特性:
+
+1. 松耦合 不限制vhost,user甚至erlang/rabbitmq的版本
+2. 网络友好 不限制网络范围,遵循amqp协议即可
+3. 高自由度 每个节点可以随意组合其他节点
+
+
+同样使用docker重新创建两个新容器
+
+    docker run -d --hostname my-rabbit-cluster-federation --name my-rabbit-cluster-federation -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+
+    docker run -d  --link my-rabbit-cluster-federation --hostname my-rabbit-cluster-federation-1 --name my-rabbit-cluster-federation-1 -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+
 
 第一步启动插件 启动每个节点的插件
 
     rabbitmq-plugins enable rabbitmq_shovel rabbitmq_shovel_management
 
-第二步 `upstream节点` 设置加入集群目标节点 设置/清楚参数,用来关联集群节点
+第二步 `dest节点`(在src节点也可以,比较灵活) 设置加入集群目标节点 设置/清楚参数,用来关联集群节点
+
+
+    rabbitmqctl set_parameter shovel my-shovel-queue '{"src-uri": "amqp://admin:admin@my-rabbit-cluster-federation/%2f", "src-queue": "shovel.queue", "dest-uri": "amqp://admin:admin@my-rabbit-cluster-federation-1/%2f", "dest-queue": "shovel.queue"}'
+
+    rabbitmqctl clear_parameter shovel my-shovel-queue
+
+
+
+设置exchange
+
+    rabbitmqctl set_parameter shovel my-shovel-exchange '{"src-uri": "amqp://admin:admin@my-rabbit-cluster-federation/%2f", "src-exchange": "shovel.exchange", "dest-uri": "amqp://admin:admin@my-rabbit-cluster-federation-1/%2f", "dest-exchange": "shovel.exchange"}'
+
+    rabbitmqctl set_parameter shovel my-shovel-exchange-1 '{"src-uri": "amqp://admin:admin@my-rabbit-cluster-federation-1/%2f", "src-exchange": "shovel.exchange", "dest-uri": "amqp://admin:admin@my-rabbit-cluster-federation/%2f", "dest-exchange": "shovel.exchange"}'
+
+
+在docker容器中,后启动的容器link了前面的容器,但是前面的无法识别到后面容器ip,如果要在`src节点` 设置shovel,注意加入域名映射
 
     echo "172.17.0.4 my-rabbit-cluster-federation-1" >> /etc/hosts
-    <!-- rabbitmqctl set_parameter shovel my-exchange-shovel '{"src-uri": "amqp://admin:admin@my-rabbit-cluster-federation/%2f", "src-exchange": "amq.direct", "dest-uri": "amqp://admin:admin@172.17.0.4/%2f", "dest-exchange": "amq.direct"}' -->
-    rabbitmqctl set_parameter shovel my-queue-shovel '{"src-uri": "amqp://admin:admin@my-rabbit-cluster-federation/%2f", "src-queue": "queue.shovel", "dest-uri": "amqp://admin:admin@my-rabbit-cluster-federation-1/%2f", "dest-queue": "queue.shovel"}'
-
-    rabbitmqctl clear_parameter shovel my-queue-shovel
-
-*注意:我测试代码的时候,发现exchange一直无法使用,不知道问什么,有知道的朋友告知一下*
 
 [代码测试用例](http://dwz.cn/6orM5N)
 
+建议先创建好queue或者exchange,如果不提前创建,代码第一次启动会报错.第二次就正常了.
+队列默认创建的是durable的exchange或者queue,如果遇到durable的问题,需要重新删掉对应的exchange或者queue,重新创建.
 
