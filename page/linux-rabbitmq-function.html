@@ -245,6 +245,89 @@ list_"要查询的参数+s",除了简单查询外,还可以限定参数.
     rabbit@zhaofeng-pc.log.1    rabbit@zhaofeng-pc-sasl.log.1
     rabbit@zhaofeng-pc.log.2    rabbit@zhaofeng-pc-sasl.log.2
     rabbit@zhaofeng-pc.log.log  rabbit@zhaofeng-pc-sasl.log.log
+
+4 启动ssl
+
+rabbitmq可以使用openssl来生成证书.生成的证书类型为`.pem`格式的,rabbitmq官方提供了简单的
+openssl配置文件,如果需要更详细的,可以参考官方演示[openssl.cnf](https://github.com/FansinZhao/openssl/blob/master/apps/openssl.cnf)
+证书生成步骤比较复杂,要生成要19个文件,为了直接查看rabbitmq的ssl配置,我整合了一下证书
+生成过程,方便测试使用[openssl-auto-ca](https://github.com/FansinZhao/openssl-auto-ca)
+使用比较简单,只是测试可以,不用修改,直接生成需要的证书.如果想要学习请参考rabbitmq官方
+或者openssl官方.
+
+使用 openssl-auto-ca 生成证书后,我们得到类似下面的数据结构
+
+    zhaofeng@zhaofeng-pc:~/dev/docker/rabbitmq-cluster$ sh createcert.sh
+    省略过程.....
+    zhaofeng@zhaofeng-pc:~/dev/docker/rabbitmq-cluster$ tree myca/
+    myca/
+    ├── client
+    │   ├── cert.pem
+    │   ├── keycert.p12
+    │   ├── key.pem
+    │   └── req.pem
+    ├── root
+    │   ├── cacert.cer
+    │   ├── cacert.pem
+    │   ├── certs
+    │   │   ├── 01.pem
+    │   │   └── 02.pem
+    │   ├── index.txt
+    │   ├── index.txt.attr
+    │   ├── index.txt.attr.old
+    │   ├── index.txt.old
+    │   ├── private
+    │   │   └── cakey.pem
+    │   ├── serial
+    │   └── serial.old
+    └── server
+        ├── cert.pem
+        ├── keycert.p12
+        ├── key.pem
+        └── req.pem
+
+    5 directories, 19 files
+
+证书生成完毕.
+
+我们还是使用docker,创建一个新的容器
+
+    docker run -d --hostname my-rabbit-ssl --name my-rabbit-ssl -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+
+rabbitmq 与之前动态增加配置不同,这次不得不要在配置文件添加ssl的.最新的rabbitmq是没有
+配置文件的,只有插件记录文件,默认配置位置是在`/etc/rabbitmq/rabbitmq.config`,自己新建
+一个文件.
+ssl配置内容如下:
+
+    [
+      {rabbit, [
+         {ssl_listeners, [5671]},
+         {ssl_options, [{cacertfile,"/cert/cacert.pem"},
+                        {certfile,"/cert/server_cert.pem"},
+                        {keyfile,"/cert/server_key.pem"},
+                        {verify,verify_peer},
+                        {fail_if_no_peer_cert,false}]}
+       ]},
+      {rabbitmq_management,
+      [{listener, [{port,     15671},
+                   {ssl,      true},
+                   {ssl_opts, [{cacertfile,"/cert/cacert.pem"},
+                        {certfile,"/cert/server_cert.pem"},
+                        {keyfile,"/cert/server_key.pem"}]}
+                  ]}
+      ]}
+    ].
+
+注意细节两点
+1. 配置文件最后的'.',不能漏掉,不然会报配置文件未结束的异常.
+2. 当增加和删除配置的时候,注意最后一项配置没有','.
+
+当正常启动后,management界面就会变成 https://ip:15672, 应用连接接口变为ip:5671
+java连接时,需要添加一行代码
+
+    factory.useSslProtocol();//自动选择一项ssl加密方式
+
+官方介绍了更多关于ssl,如果有特殊需要,参考官网文档.
                 </textarea>
                 </div>
 

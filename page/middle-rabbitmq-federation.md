@@ -15,9 +15,9 @@ amqp协议传输消息,由于是遵循协议,所以节点之间的版本可以�
 
 我使用docker创建两个容器
 
-    docker run -d --hostname my-rabbit-cluster-federation --name my-rabbit-cluster-federation -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+    docker run -d --hostname my-rabbit-cluster-federation --name my-rabbit-cluster-federation  fansin/rabbitmq-cluster
 
-    docker run -d  --link my-rabbit-cluster-federation --hostname my-rabbit-cluster-federation-1 --name my-rabbit-cluster-federation-1 -e RABBITMQ_ERLANG_COOKIE='secret cookie here' fansin/rabbitmq-cluster
+    docker run -d  --link my-rabbit-cluster-federation --hostname my-rabbit-cluster-federation-1 --name my-rabbit-cluster-federation-1  fansin/rabbitmq-cluster
 
 第一步启动插件 启动每个节点的插件
 
@@ -45,6 +45,8 @@ amqp协议传输消息,由于是遵循协议,所以节点之间的版本可以�
 
 第四步验证集群
 
+    rabbitmqctl eval 'rabbit_federation_status:status().'
+
 现在看my-rabbit-cluster-federation的集群会看到多个连接,然后再看
 my-rabbit-cluster-federation-1也会看到多个连接,同时exchange上会有"federate-all"
 特性.
@@ -54,6 +56,11 @@ my-rabbit-cluster-federation-1也会看到多个连接,同时exchange上会有"f
 
 建议先创建好queue或者exchange,如果不提前创建,代码第一次启动会报错.第二次就正常了.
 队列默认创建的是durable的exchange或者queue,如果遇到durable的问题,需要重新删掉对应的exchange或者queue,重新创建.
+
+[docker federation]()
+
+    docker run -d --hostname my-rabbit-federation --name my-rabbit-federation fansin/rabbitmq-federation
+    docker run -d  --link my-rabbit-federation -e JOIN_CLUSTER=my-rabbit-federation --hostname my-rabbit-federation-1 --name my-rabbit-federation-1 fansin/rabbitmq-federation
 
 
 再次贴一下与[原生集群](https://fansinzhao.github.io/page/linux-rabbitmq-cluster.html)的区别:
