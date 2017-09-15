@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Clean Blog - Sample Post</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                Menu <i class="fa fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="../index.html">Start Bootstrap</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="../index.html">主页</a>
+                </li>
+                <li>
+                    <a href="../linux.html">Linux/Ubuntu</a>
+                </li>
+                <li>
+                    <a href="../post.html">Sample Post</a>
+                </li>
+                <li>
+                    <a href="../contact.html">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<!-- Page Header -->
+<!-- Set your background image for this header on the line below. -->
+<header class="intro-header" style="background-image: url('http://p1.pichost.me/i/23/1463754.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <h1 id="hadoop-官方文档快速搭建"><a href="#hadoop-官方文档快速搭建" name="hadoop-官方文档快速搭建">hadoop 官方文档快速搭建</a></h1>
+                    <p>hadoop 2.8.1 , jdk8+</p>
+                    <p>参考官方文档,具体步骤请查看官网,本文以实践为主.</p>
+                    <p>下载完毕hadoop后,解压.</p>
+                    <h2 id="准备工作不可跳过"><a href="#准备工作不可跳过" name="准备工作不可跳过">准备工作,不可跳过!</a></h2>
+                    <ul>
+                        <li class="p">
+                            <p class="p">安装ssh,因为hadoop需要登录系统</p>
+                            <pre><code> sudo apt-get install ssh
+ sudo apt-get install pdsh
+</code></pre>
+                        </li>
+                        <li class="p">
+                            <p class="p">编辑 etc/hadoop/hadoop-env.sh,还是因为要登录系统,原先系统设置的环境变量无效.</p>
+                            <p># set to the root of your Java installation
+                                export JAVA_HOME=/opt/jdk1.8.0_92</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">单机模式下</p>
+                            <p>etc/hadoop/core-site.xml:</p>
+                            <pre><code> &lt;configuration&gt;
+     &lt;property&gt;
+         &lt;name&gt;fs.defaultFS&lt;/name&gt;
+         &lt;value&gt;hdfs://localhost:9900&lt;/value&gt;
+     &lt;/property&gt;
+ &lt;/configuration&gt;
+</code></pre>
+                            <p>etc/hadoop/hdfs-site.xml:</p>
+                            <pre><code> &lt;configuration&gt;
+     &lt;property&gt;
+         &lt;name&gt;dfs.replication&lt;/name&gt;
+         &lt;value&gt;1&lt;/value&gt;
+     &lt;/property&gt;
+ &lt;/configuration&gt;
+</code></pre>
+                        </li>
+                    </ul>
+                    <h2 id="单机示例具体应该是三个实例namenodesecondarynodedatanode"><a href="#单机示例具体应该是三个实例namenodesecondarynodedatanode" name="单机示例具体应该是三个实例namenodesecondarynodedatanode">单机示例(具体应该是三个实例,namenode,secondarynode,datanode)</a></h2>
+                    <pre><code>bin/hdfs namenode -format
+sbin/start-dfs.sh
+</code></pre>
+                    <p>关闭hadoop系统</p>
+                    <pre><code>sbin/stop-dfs.sh
+</code></pre>
+                    <p>完成上面两步可以看到web,跟官方文档不太一样,查看<code>cat logs/hadoop-$(whoami)-namenode-$(hostname).log</code></p>
+                    <pre><code>Starting Web-server for hdfs at: http://account.jetbrains.com:50070
+</code></pre>
+                    <p><img src="file:///home/zhaofeng/Git/bootstrap/fansinzhao-blog/page/image/hadoop-ui.png" alt="" /></p>
+                    <p>完成这一步就已经有了一个hadoop的最基本的环境.</p>
+                    <p>下面创建MapReduce用户hadoop,并执行一个任务</p>
+                    <pre><code>bin/hdfs dfs -mkdir /user
+bin/hdfs dfs -mkdir /user/hadoop
+
+bin/hdfs dfs -mkdir -p input
+bin/hdfs dfs -put etc/hadoop/*.xml input
+
+bin/hadoop jar share/hadoop/mapreduce/hadoop-mapreduce-examples-2.8.1.jar grep input output 'dfs[a-z.]+'
+
+bin/hdfs dfs -get output output
+cat output/*
+</code></pre>
+                    <p>为了方便学习我做了一个简单的<a href="https://hub.docker.com/r/fansin/hadoop/">hadoop镜像</a>,使用下面命令快速创建一个hadoop单机容器.</p>
+                    <pre><code>docker run --name my-hadoop -itd fansin/hadoop
+</code></pre>
+                    <h2 id="yarn-集群资源管理"><a href="#yarn-集群资源管理" name="yarn-集群资源管理">YARN 集群资源管理</a></h2>
+                    <p>将etc/hadoop/mapred-site.xml.template重命名为etc/hadoop/mapred-site.xml:</p>
+                    <pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+        &lt;name&gt;mapreduce.framework.name&lt;/name&gt;
+        &lt;value&gt;yarn&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+                    <p>etc/hadoop/yarn-site.xml:</p>
+                    <pre><code>&lt;configuration&gt;
+    &lt;!-- Site specific YARN configuration properties --&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.aux-services&lt;/name&gt;
+        &lt;value&gt;mapreduce_shuffle&lt;/value&gt;
+    &lt;/property&gt;
+    &lt;property&gt;
+        &lt;name&gt;yarn.nodemanager.env-whitelist&lt;/name&gt;
+        &lt;value&gt;JAVA_HOME,HADOOP_COMMON_HOME,HADOOP_HDFS_HOME,HADOOP_CONF_DIR,CLASSPATH_PREPEND_DISTCACHE,HADOOP_YARN_HOME,HADOOP_MAPRED_HOME&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+                    <p>启动脚本</p>
+                    <pre><code>sbin/start-yarn.sh
+</code></pre>
+                    <p>查看日志确定一下web界面入口,<code>cat logs/yarn-$(whoami)-resourcemanager-$(hostname).log</code></p>
+                    <pre><code>Web app cluster started at 8088
+</code></pre>
+                    <p>yarn集群资源管理界面地址为 <a href="http://localhost:8088">http://localhost:8088</a></p>
+                    <p><img src="file:///home/zhaofeng/Git/bootstrap/fansinzhao-blog/page/image/hadoop-yarn-ui.png" alt="" /></p>
+                    <p><em>提示</em>
+                        如果更换hadoop版本时,无法启动时,需要将<code>/tmp/</code>hadoop相关的文件删除</p>
+                </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div markdown-view > </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        </div>
+    </div>
+</article>
+
+<hr>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="thumbnail text-center">
+                    <img data-src="holder.js/300x300" alt="300x300" style="height: 150px; width: 150px; display: block;" src="image/weixin.png" data-holder-rendered="true">
+                    <div class="caption">
+                        <p>↑↑扫这个的都是天才↑↑</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="https://github.com/FansinZhao">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                        </a>
+                    </li>
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Your Website 2016</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="../vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!--markdown-->
+<script src="../vendor/markdown/markdown.min.js"></script>
+<script src="../vendor/markdown/jquery-markdown.js"></script>
+
+<!-- Contact Form JavaScript -->
+<script src="../js/jqBootstrapValidation.js"></script>
+<script src="../js/contact_me.js"></script>
+
+<!-- Theme JavaScript -->
+<script src="../js/clean-blog.min.js"></script>
+</body>
+
+</html>

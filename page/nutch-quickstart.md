@@ -112,7 +112,7 @@
 
 
 
-### 3.1 [快速安装hadoop]()
+### 3.1 [快速安装hadoop](https://fansinzhao.github.io/page/linux-hadoop-quickstart.html)
 
 解压并进入安装目录:
 
@@ -169,27 +169,29 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
     Starting Web-server for hdfs at: http://account.jetbrains.com:50070
 
 
-#### 3.1.5 [YARN 集群资源管理]()
+#### 3.1.5 [YARN 集群资源管理](https://fansinzhao.github.io/page/linux-hadoop-quickstart.html)
 
 #### 3.1.6 停止和销毁
 
     sbin/stop-dfs.sh
     rm -r /tmp/hadoop*
 
-### 3.2 [快速安装hbase]()
+### 4 [hbase 0.98.8-hadoop2](http://archive.apache.org/dist/hbase/hbase-0.98.8/)
 
     注意:
     hbase < 1.0版本web UI 地址是 http://localhost:60010
 
+#### 4.0 [快速安装hbase](https://fansinzhao.github.io/page/linux-hbase-hadoop-quickstart.html)
+
 解压并进入安装目录
 
-#### 3.2.1 启动和停止hbase
+#### 4.1 启动和停止hbase
 
     bin/start-hbase.sh
     bin/stop-hbase.sh
     rm -r /tmp/hbase*
 
-#### 3.2.2 集成hadoop
+#### 4.2 集成hadoop
 
 按照上面设置创建了hadoop.暴露的端口是9900
 修改配置文件`conf/hbase-site.xml`(默认为空),添加以下内容
@@ -241,7 +243,7 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
     -rw-r--r--   3 zhaofeng supergroup          7 2017-08-29 14:25 /hbase/hbase.version
     drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/oldWALs
 
-### 3.3 再次测试nutch
+### 4.3 再次测试nutch
 
 在`runtime/`创建一个文件`urls/seed.txt`,并在里面填写需要爬取文件内容.
 
@@ -253,18 +255,18 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
     bin/nutch readdb -url http://nutch.apache.org/ -text
 
 
-## 4 Apache Solr
+## 5 Apache Solr
 
 为了方便对数据进行分析,使用solr来分析获取的数据
 
-### 4.1 集成nutch和solr
+### 5.1 集成nutch和solr
 下载并进入进入solr 6.6.0 安装目录
 
-#### 4.1.1 创建一个nutch 配置文件
+#### 5.1.1 创建一个nutch 配置文件
 
     cp -r server/solr/configsets/basic_configs server/solr/configsets/nutch
 
-#### 4.1.2 把nutch安装目录中的`conf/schema.xml`复制到solr下的`server/solr/configsets/nutch/conf`
+#### 5.1.2 把nutch安装目录中的`conf/schema.xml`复制到solr下的`server/solr/configsets/nutch/conf`
 并注释掉不支持参数
 
     <!--
@@ -274,11 +276,11 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
 
 全文删除参数`enablePositionIncrements="true"`
 
-#### 4.1.3 删掉文件 `server/solr/configsets/nutch/conf/managed-schema`
+#### 5.1.3 删掉文件 `server/solr/configsets/nutch/conf/managed-schema`
 
     rm server/solr/configsets/nutch/conf/managed-schema
 
-#### 4.1.4 注释掉文件`server/solr/configsets/nutch/conf/solrconfig.xml`
+#### 5.1.4 注释掉文件`server/solr/configsets/nutch/conf/solrconfig.xml`
 
     <!--
     <processor class="solr.AddSchemaFieldsUpdateProcessorFactory">
@@ -310,6 +312,11 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
 
 查看页面 http://localhost:8983/solr/#/nutch
 
+为了方便学习我做了一个简单的[solr for nutch 镜像](https://hub.docker.com/r/fansin/solr/),使用下面命令快速创建一个hbase单机容器.
+
+     docker run --name nutch-solr -itd fansin/solr:nutch
+
+
 不要忘记开启nutch的solr插件功能,修改nutch的`runtime/conf/nutch-site.xml`
 
     <property>
@@ -325,7 +332,7 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
 
 
 
-## 4.2 使用nutch craw命令爬取数据
+## 5.2 使用nutch craw命令爬取数据
 
 
 在`runtime/`创建一个文件`urls/seed.txt`,并在里面填写需要爬取文件内容.
@@ -400,6 +407,10 @@ hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所�
     SOLR dedup -> http://localhost:8983/solr/nutch
     /opt/apache-nutch-2.3.1/runtime/local/bin/nutch solrdedup -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true http://localhost:8983/solr/nutch
 
+
+为了方便学习我做了一个简单的[nutch镜像](https://hub.docker.com/r/fansin/nutch2/),使用下面命令快速创建一个hbase单机容器.
+
+     docker run -it --link nutch-solr:solr -v /home/zhaofeng/seed.txt:/apache-nutch-2.3.1/urls/seed.txt  fansin/nutch2
 
 
 

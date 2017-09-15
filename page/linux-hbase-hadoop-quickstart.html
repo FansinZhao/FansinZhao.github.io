@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Clean Blog - Sample Post</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                Menu <i class="fa fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="../index.html">Start Bootstrap</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="../index.html">主页</a>
+                </li>
+                <li>
+                    <a href="../linux.html">Linux/Ubuntu</a>
+                </li>
+                <li>
+                    <a href="../post.html">Sample Post</a>
+                </li>
+                <li>
+                    <a href="../contact.html">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<!-- Page Header -->
+<!-- Set your background image for this header on the line below. -->
+<header class="intro-header" style="background-image: url('http://p1.pichost.me/i/23/1463754.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <h1 id="hbase--hadoop-官方文档快速搭建"><a href="#hbase--hadoop-官方文档快速搭建" name="hbase--hadoop-官方文档快速搭建">hbase + hadoop 官方文档快速搭建</a></h1>
+                    <p>hbase版本1.26,hadoop版本2.8.1,jdk8+</p>
+                    <h1 id="简单单机"><a href="#简单单机" name="简单单机">简单单机</a></h1>
+                    <p>进入安装目录执行命令启动</p>
+                    <pre><code>bin/start-hbase.sh
+</code></pre>
+                    <p>停止hbase</p>
+                    <pre><code>bin/stop-hbase.sh
+</code></pre>
+                    <p>hbase提供了ui界面<a href="http://localhost:16010">http://localhost:16010</a>
+                        同时可以通过<code>jps -l</code>查看</p>
+                    <pre><code>jps -l
+32399 org.apache.hadoop.hbase.master.HMaster
+</code></pre>
+                    <p>现在就很简单的启动了hbase!</p>
+                    <p>自定义配置文件<code>conf/hbase-site.xml</code>,添加单机配置,注意切换到自己的路径</p>
+                    <pre><code>&lt;configuration&gt;
+  &lt;property&gt;
+    &lt;name&gt;hbase.rootdir&lt;/name&gt;
+    &lt;value&gt;file:////opt/hbase-1.2.6&lt;/value&gt;
+  &lt;/property&gt;
+  &lt;property&gt;
+    &lt;name&gt;hbase.zookeeper.property.dataDir&lt;/name&gt;
+    &lt;value&gt;/opt/zookeeper-3.4.9&lt;/value&gt;
+  &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+                    <p>简单测试hbase
+                        连接控制台</p>
+                    <p>bin/hbase shell
+                        hbase(main):001:0&gt;</p>
+                    <p>创建表,新建记录,废止表,移除表(比较简单,摘抄官网)</p>
+                    <pre><code>hbase(main):001:0&gt; create 'test', 'cf'
+0 row(s) in 0.4170 seconds
+
+=&gt; Hbase::Table - test
+
+hbase(main):002:0&gt; list 'test'
+TABLE
+test
+1 row(s) in 0.0180 seconds
+
+=&gt; [&quot;test&quot;]
+hbase(main):003:0&gt; put 'test', 'row1', 'cf:a', 'value1'
+0 row(s) in 0.0850 seconds
+
+hbase(main):004:0&gt; put 'test', 'row2', 'cf:b', 'value2'
+0 row(s) in 0.0110 seconds
+
+hbase(main):005:0&gt; put 'test', 'row3', 'cf:c', 'value3'
+0 row(s) in 0.0100 seconds
+hbase(main):006:0&gt; scan 'test'
+ROW                                      COLUMN+CELL
+ row1                                    column=cf:a, timestamp=1421762485768, value=value1
+ row2                                    column=cf:b, timestamp=1421762491785, value=value2
+ row3                                    column=cf:c, timestamp=1421762496210, value=value3
+3 row(s) in 0.0230 seconds
+hbase(main):007:0&gt; get 'test', 'row1'
+COLUMN                                   CELL
+ cf:a                                    timestamp=1421762485768, value=value1
+1 row(s) in 0.0350 seconds
+hbase(main):008:0&gt; disable 'test'
+0 row(s) in 1.1820 seconds
+
+hbase(main):009:0&gt; enable 'test'
+0 row(s) in 0.1770 seconds
+
+hbase(main):008:0&gt; disable 'test'
+    0 row(s) in 1.1820 seconds
+hbase(main):011:0&gt; drop 'test'
+0 row(s) in 0.1370 seconds
+</code></pre>
+                    <p>命令是比较简单的:</p>
+                    <pre><code>create 表名 , 列名
+list 表名
+put 表名 ,行名 ,列名:列值 ,值
+get 表名,行名
+scan 表名
+disable 表名
+enable 表名
+drop 表名 //安全起见必须先disable
+</code></pre>
+                    <h1 id="使用hadoop"><a href="#使用hadoop" name="使用hadoop">使用Hadoop</a></h1>
+                    <p>为了防止hbase的数据丢失,一般都是要跟hadoop结合使用.
+                        关于hadoop的创建,请看我相关的<a href="https://fansinzhao.github.io/page/linux-hadoop-quickstart.html">Hadoop 快速创建</a></p>
+                    <p>现在假设我们已经按照另一篇文章创建了hadoop.默认暴露的端口是9900
+                        修改配置文件<code>conf/hbase-site.xml</code>(默认为空),添加以下内容</p>
+                    <pre><code>&lt;property&gt;
+  &lt;name&gt;hbase.cluster.distributed&lt;/name&gt;
+  &lt;value&gt;true&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+  &lt;name&gt;hbase.rootdir&lt;/name&gt;
+  &lt;value&gt;hdfs://localhost:9900/hbase&lt;/value&gt;
+&lt;/property&gt;
+</code></pre>
+                    <p>设置jdk版本,修改启动脚本bin/start-hbase.sh</p>
+                    <pre><code>export JAVA_HOME=/opt/jdk1.8.0_92
+</code></pre>
+                    <p>修改完配置后,重新启动hbase</p>
+                    <pre><code>bin/start-hbase.sh
+</code></pre>
+                    <p>查看hadoop是否正常加入,进入hadoop安装目录</p>
+                    <pre><code>zhaofeng@zhaofeng-pc:/opt/hadoop-2.8.1$ bin/hadoop fs -ls /hbase
+Found 9 items
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/.tmp
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/MasterProcWALs
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/WALs
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 15:51 /hbase/archive
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 15:37 /hbase/corrupt
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 14:25 /hbase/data
+-rw-r--r--   3 zhaofeng supergroup         42 2017-08-29 14:25 /hbase/hbase.id
+-rw-r--r--   3 zhaofeng supergroup          7 2017-08-29 14:25 /hbase/hbase.version
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/oldWALs
+</code></pre>
+                    <p>这时会比单机多一个进程,用于管理数据的RegionServer</p>
+                    <pre><code>zhaofeng@zhaofeng-pc:/opt/hbase-1.2.6$ jps -l | grep hbase
+1618 org.apache.hadoop.hbase.regionserver.HRegionServer
+1448 org.apache.hadoop.hbase.zookeeper.HQuorumPeer
+1515 org.apache.hadoop.hbase.master.HMaster
+</code></pre>
+                    <p>为了方便学习我做了一个简单的<a href="https://hub.docker.com/r/fansin/hbase/">hbase镜像</a>,使用下面命令快速创建一个hbase单机容器.</p>
+                    <pre><code>docker run --name my-hbase-nutch -itd fansin/hbase:0.98.8
+</code></pre>
+                    <p>Hbase 还提供了简单的master和region备份脚本</p>
+                    <pre><code>//启动接口偏移量分别2 3 5的3个master的backup
+bin/local-master-backup.sh start 2 3 5
+
+//启动接口偏移量分别2 3 5的3个region的backup
+bin/local-regionservers.sh start 2 3 5
+</code></pre>
+                    <p>现在的进程应该是这样的</p>
+                    <pre><code>jps -l | grep hbase
+2272 org.apache.hadoop.hbase.master.HMaster
+2343 org.apache.hadoop.hbase.master.HMaster
+1448 org.apache.hadoop.hbase.zookeeper.HQuorumPeer
+1515 org.apache.hadoop.hbase.master.HMaster
+2765 org.apache.hadoop.hbase.regionserver.HRegionServer
+2833 org.apache.hadoop.hbase.regionserver.HRegionServer
+1618 org.apache.hadoop.hbase.regionserver.HRegionServer
+2425 org.apache.hadoop.hbase.master.HMaster
+2909 org.apache.hadoop.hbase.regionserver.HRegionServer
+</code></pre>
+                    <p>可以直接kill pid,也可以使用脚本关闭</p>
+                    <pre><code>bin/local-master-backup.sh stop 3
+
+bin/local-regionservers.sh stop 3
+</code></pre>
+                    <p>更详细分布式集群配置请查看官网.本文只做入门</p>
+                </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div markdown-view > </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        </div>
+    </div>
+</article>
+
+<hr>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="thumbnail text-center">
+                    <img data-src="holder.js/300x300" alt="300x300" style="height: 150px; width: 150px; display: block;" src="image/weixin.png" data-holder-rendered="true">
+                    <div class="caption">
+                        <p>↑↑扫这个的都是天才↑↑</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="https://github.com/FansinZhao">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                        </a>
+                    </li>
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Your Website 2016</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="../vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!--markdown-->
+<script src="../vendor/markdown/markdown.min.js"></script>
+<script src="../vendor/markdown/jquery-markdown.js"></script>
+
+<!-- Contact Form JavaScript -->
+<script src="../js/jqBootstrapValidation.js"></script>
+<script src="../js/contact_me.js"></script>
+
+<!-- Theme JavaScript -->
+<script src="../js/clean-blog.min.js"></script>
+</body>
+
+</html>

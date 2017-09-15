@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Clean Blog - Sample Post</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Theme CSS -->
+    <link href="../css/clean-blog.min.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="../vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet'
+          type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800'
+          rel='stylesheet' type='text/css'>
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header page-scroll">
+            <button type="button" class="navbar-toggle" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
+                <span class="sr-only">Toggle navigation</span>
+                Menu <i class="fa fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="../index.html">Start Bootstrap</a>
+        </div>
+
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a href="../index.html">主页</a>
+                </li>
+                <li>
+                    <a href="../linux.html">Linux/Ubuntu</a>
+                </li>
+                <li>
+                    <a href="../post.html">Sample Post</a>
+                </li>
+                <li>
+                    <a href="../contact.html">Contact</a>
+                </li>
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+    <!-- /.container -->
+</nav>
+
+<!-- Page Header -->
+<!-- Set your background image for this header on the line below. -->
+<header class="intro-header" style="background-image: url('http://p1.pichost.me/i/23/1463754.jpg')">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Post Content -->
+<article>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <h1 id="nutch-快速搭建其实并不快ㄒoㄒ"><a href="#nutch-快速搭建其实并不快ㄒoㄒ" name="nutch-快速搭建其实并不快ㄒoㄒ">nutch 快速搭建(其实并不快/(ㄒoㄒ)/~~)</a></h1>
+                    <p>由于个人的一些事,我需要搭建一个爬虫,当我去比较爬虫框架时,发现&quot;多如牛毛&quot;,各种语言的都有.
+                        经过一段时间的考虑,我选择自己能够快速上手并且比较用的比较多的.我想要掘取搜索引擎查询的内容,
+                        最终的选择是nutch和heritrix,但是heritrix最新的更新也是2014年的,根据招聘网站上的职位
+                        要求(毕竟可能在工作用到),大部分集中在python和这两款.综上,选择了nutch作为我的最终选择.</p>
+                    <h1 id="复杂的编译过程"><a href="#复杂的编译过程" name="复杂的编译过程">&quot;复杂的&quot;编译过程</a></h1>
+                    <p><em>提示:</em></p>
+                    <p>如果想快速搭建nutch环境,必须要遵循官网的建议,不能一味使用最新的软件(不多说了,都是泪/(ㄒoㄒ)/~~).</p>
+                    <h2 id="1-apache-gora-07-下载"><a href="#1-apache-gora-07-下载" name="1-apache-gora-07-下载">1 Apache Gora 0.7 <a href="http://www.apache.org/dyn/closer.cgi/gora/0.7/gora/0.7/gora-0.6.1-src.tar.gz">下载</a></a></h2>
+                    <p>它是专门为大数据设计的开源orm框架.支持列(hbase)存储,KV值存储(Cassandra),文档存储(mongdb),
+                        关系型数据库(mysql),通过hadoop的MapReduce来分析数据.</p>
+                    <p>如果有折腾的心,可以尝试使用gora编译最新版本的hbase和hadoop.
+                        我尝试了一下,失败了!有兴趣的可以尝试,我说一下我遇到的坑</p>
+                    <ol>
+                        <li>官网上只发现了0.7的版本,编译jar中,缺失gora-shims-distribution-0.6.1.jar</li>
+                        <li>gora的源码中GoraMapper.initMapperJob() 接口发生变化,需要修改gora或者nutch源码</li>
+                        <li>修复了2中的api,后面还有更多的erro...</li>
+                    </ol>
+                    <h2 id="2-apache-nutch-231-下载"><a href="#2-apache-nutch-231-下载" name="2-apache-nutch-231-下载">2 Apache Nutch 2.3.1 <a href="http://www.apache.org/dyn/closer.lua/nutch/2.3.1/apache-nutch-2.3.1-src.tar.gz">下载</a></a></h2>
+                    <p>解压后,进入安装目录:</p>
+                    <h4 id="1-修改站点文件confnutch-sitexml添加一下配置"><a href="#1-修改站点文件confnutch-sitexml添加一下配置" name="1-修改站点文件confnutch-sitexml添加一下配置">1 修改站点文件<code>conf/nutch-site.xml</code>添加一下配置</a></h4>
+                    <pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+     &lt;name&gt;http.agent.name&lt;/name&gt;
+     &lt;value&gt;My Nutch Spider&lt;/value&gt;
+    &lt;/property&gt;
+
+    &lt;property&gt;
+        &lt;name&gt;storage.data.store.class&lt;/name&gt;
+        &lt;value&gt;org.apache.gora.hbase.store.HBaseStore&lt;/value&gt;
+        &lt;description&gt;Default class for storing data&lt;/description&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+                    <h4 id="2-修改配置文件confgorapropertieshbasestore-properties添加"><a href="#2-修改配置文件confgorapropertieshbasestore-properties添加" name="2-修改配置文件confgorapropertieshbasestore-properties添加">2 修改配置文件<code>conf/gora.properties</code>,&quot;HBaseStore properties&quot;添加</a></h4>
+                    <pre><code>#########################
+# HBaseStore properties #
+#########################
+gora.datastore.default=org.apache.gora.hbase.store.HBaseStore
+</code></pre>
+                    <h4 id="3-修改配置文件ivyivyxml使用hbase-作为gora-后台数据库"><a href="#3-修改配置文件ivyivyxml使用hbase-作为gora-后台数据库" name="3-修改配置文件ivyivyxml使用hbase-作为gora-后台数据库">3 修改配置文件<code>ivy/ivy.xml</code>,使用hbase 作为gora 后台数据库</a></h4>
+                    <pre><code>&lt;dependency org=&quot;org.apache.gora&quot; name=&quot;gora-hbase&quot; rev=&quot;0.6.1&quot; conf=&quot;*-&gt;default&quot; /&gt;
+&lt;dependency org=&quot;org.apache.hbase&quot; name=&quot;hbase-common&quot; rev=&quot;0.98.8-hadoop2&quot; conf=&quot;*-&gt;default&quot; /&gt;
+</code></pre>
+                    <h4 id="4-开始编译如果你不想傻傻等待屏幕静止10min记得加上-d开启debug模式"><a href="#4-开始编译如果你不想傻傻等待屏幕静止10min记得加上-d开启debug模式" name="4-开始编译如果你不想傻傻等待屏幕静止10min记得加上-d开启debug模式">4 开始编译,如果你不想傻傻等待屏幕静止10+min,记得加上-d,开启debug模式</a></h4>
+                    <pre><code>ant clean
+ant -d runtime
+</code></pre>
+                    <p>等待编译成功后,在安装目录下出现<code>runtime/</code>文件夹,大概如下,限于冗余篇幅,只罗列2层目录</p>
+                    <pre><code>tree runtime/ -d -L 2
+runtime/
+├── deploy
+│   └── bin
+└── local
+    ├── bin
+    ├── conf
+    ├── lib
+    ├── plugins
+    └── test
+
+8 directories
+</code></pre>
+                    <h4 id="5-简单测试一下我们生成的脚本是否可用"><a href="#5-简单测试一下我们生成的脚本是否可用" name="5-简单测试一下我们生成的脚本是否可用">5 简单测试一下我们生成的脚本是否可用</a></h4>
+                    <pre><code>zhaofeng@zhaofeng-pc:/opt/apache-nutch-2.3.1/runtime/local$bin/nutch
+Usage: nutch COMMAND
+where COMMAND is one of:
+ inject		inject new urls into the database
+ hostinject     creates or updates an existing host table from a text file
+ generate 	generate new batches to fetch from crawl db
+ fetch 		fetch URLs marked during generate
+ parse 		parse URLs marked during fetch
+ updatedb 	update web table after parsing
+ updatehostdb   update host table after parsing
+ readdb 	read/dump records from page database
+ readhostdb     display entries from the hostDB
+ index          run the plugin-based indexer on parsed batches
+ elasticindex   run the elasticsearch indexer - DEPRECATED use the index command instead
+ solrindex 	run the solr indexer on parsed batches - DEPRECATED use the index command instead
+ solrdedup 	remove duplicates from solr
+ solrclean      remove HTTP 301 and 404 documents from solr - DEPRECATED use the clean command instead
+ clean          remove HTTP 301 and 404 documents and duplicates from indexing backends configured via plugins
+ parsechecker   check the parser for a given url
+ indexchecker   check the indexing filters for a given url
+ plugin 	load a plugin and run one of its classes main()
+ nutchserver    run a (local) Nutch server on a user defined port
+ webapp         run a local Nutch web application
+ junit         	runs the given JUnit test
+ or
+ CLASSNAME 	run the class named CLASSNAME
+Most commands print help when invoked w/o parameters.
+</code></pre>
+                    <h2 id="3-hadoop-281-下载-和-hbase-0988-hadoop2-下载"><a href="#3-hadoop-281-下载-和-hbase-0988-hadoop2-下载" name="3-hadoop-281-下载-和-hbase-0988-hadoop2-下载">3 hadoop 2.8.1 <a href="http://www.apache.org/dyn/closer.cgi/hadoop/common/hadoop-2.8.1/hadoop-2.8.1.tar.gz">下载</a> 和 hbase 0.98.8-hadoop2 <a href="http://archive.apache.org/dist/hbase/hbase-0.98.8/">下载</a></a></h2>
+                    <h3 id="31-快速安装hadoop"><a href="#31-快速安装hadoop" name="31-快速安装hadoop">3.1 <a href="https://fansinzhao.github.io/page/linux-hadoop-quickstart.html">快速安装hadoop</a></a></h3>
+                    <p>解压并进入安装目录:</p>
+                    <h4 id="311-安装ssh"><a href="#311-安装ssh" name="311-安装ssh">3.1.1 安装ssh</a></h4>
+                    <p>hadoop 是一种分布式文件系统,即使是本地也是需要登录的,所以ssh是必要的.</p>
+                    <pre><code>   sudo apt-get install ssh
+   sudo apt-get install pdsh
+</code></pre>
+                    <p>####3.1.2 设置JAVA_HOME</p>
+                    <p>编辑 etc/hadoop/hadoop-env.sh,还是因为要登录系统,原先系统设置的环境变量无效.</p>
+                    <pre><code># set to the root of your Java installation
+export JAVA_HOME=/opt/jdk1.8.0_92
+</code></pre>
+                    <h4 id="313-单机模式-设置端口和复制模式"><a href="#313-单机模式-设置端口和复制模式" name="313-单机模式-设置端口和复制模式">3.1.3 单机模式-设置端口和复制模式</a></h4>
+                    <p>向两个站点文件添加配置,默认为空配置</p>
+                    <pre><code>   etc/hadoop/core-site.xml:
+
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;fs.defaultFS&lt;/name&gt;
+                &lt;value&gt;hdfs://localhost:9900&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+
+   etc/hadoop/hdfs-site.xml:
+
+        &lt;configuration&gt;
+            &lt;property&gt;
+                &lt;name&gt;dfs.replication&lt;/name&gt;
+                &lt;value&gt;1&lt;/value&gt;
+            &lt;/property&gt;
+        &lt;/configuration&gt;
+</code></pre>
+                    <h4 id="314-启动hadoop并验证"><a href="#314-启动hadoop并验证" name="314-启动hadoop并验证">3.1.4 启动hadoop并验证</a></h4>
+                    <pre><code>bin/hdfs namenode -format
+sbin/start-dfs.sh
+</code></pre>
+                    <p>正常启动会有3个线程,namenode,secondarynode,datanode</p>
+                    <pre><code>zhaofeng@zhaofeng-pc:~$ jps -l | grep hdfs
+14375 org.apache.hadoop.hdfs.server.namenode.NameNode
+14793 org.apache.hadoop.hdfs.server.namenode.SecondaryNameNode
+14538 org.apache.hadoop.hdfs.server.datanode.DataNode
+</code></pre>
+                    <p>,跟官方文档不太一样,查看<code>cat logs/hadoop-$(whoami)-namenode-$(hostname).log</code></p>
+                    <pre><code>Starting Web-server for hdfs at: http://account.jetbrains.com:50070
+</code></pre>
+                    <h4 id="315-yarn-集群资源管理"><a href="#315-yarn-集群资源管理" name="315-yarn-集群资源管理">3.1.5 <a href="https://fansinzhao.github.io/page/linux-hadoop-quickstart.html">YARN 集群资源管理</a></a></h4>
+                    <h4 id="316-停止和销毁"><a href="#316-停止和销毁" name="316-停止和销毁">3.1.6 停止和销毁</a></h4>
+                    <pre><code>sbin/stop-dfs.sh
+rm -r /tmp/hadoop*
+</code></pre>
+                    <h3 id="4-hbase-0988-hadoop2"><a href="#4-hbase-0988-hadoop2" name="4-hbase-0988-hadoop2">4 <a href="http://archive.apache.org/dist/hbase/hbase-0.98.8/">hbase 0.98.8-hadoop2</a></a></h3>
+                    <pre><code>注意:
+hbase &lt; 1.0版本web UI 地址是 http://localhost:60010
+</code></pre>
+                    <h4 id="40-快速安装hbase"><a href="#40-快速安装hbase" name="40-快速安装hbase">4.0 <a href="https://fansinzhao.github.io/page/linux-hbase-hadoop-quickstart.html">快速安装hbase</a></a></h4>
+                    <p>解压并进入安装目录</p>
+                    <h4 id="41-启动和停止hbase"><a href="#41-启动和停止hbase" name="41-启动和停止hbase">4.1 启动和停止hbase</a></h4>
+                    <pre><code>bin/start-hbase.sh
+bin/stop-hbase.sh
+rm -r /tmp/hbase*
+</code></pre>
+                    <h4 id="42-集成hadoop"><a href="#42-集成hadoop" name="42-集成hadoop">4.2 集成hadoop</a></h4>
+                    <p>按照上面设置创建了hadoop.暴露的端口是9900
+                        修改配置文件<code>conf/hbase-site.xml</code>(默认为空),添加以下内容</p>
+                    <pre><code>&lt;configuration&gt;
+    &lt;property&gt;
+      &lt;name&gt;hbase.cluster.distributed&lt;/name&gt;
+      &lt;value&gt;true&lt;/value&gt;
+    &lt;/property&gt;
+
+    &lt;property&gt;
+      &lt;name&gt;hbase.rootdir&lt;/name&gt;
+      &lt;value&gt;hdfs://localhost:9900/hbase&lt;/value&gt;
+    &lt;/property&gt;
+&lt;/configuration&gt;
+</code></pre>
+                    <p>设置jdk版本,修改启动脚本bin/start-hbase.sh</p>
+                    <pre><code>export JAVA_HOME=/opt/jdk1.8.0_92
+</code></pre>
+                    <p>修改完配置后,重新启动hbase</p>
+                    <pre><code>bin/start-hbase.sh
+</code></pre>
+                    <p>这时会比单机多一个进程,HRegionServer-用于管理数据的RegionServer</p>
+                    <pre><code>zhaofeng@zhaofeng-pc:/opt/hbase-1.2.6$ jps -l | grep hbase
+1618 org.apache.hadoop.hbase.regionserver.HRegionServer
+1448 org.apache.hadoop.hbase.zookeeper.HQuorumPeer
+1515 org.apache.hadoop.hbase.master.HMaster
+</code></pre>
+                    <p>简单测试hbase
+                        连接控制台</p>
+                    <p>bin/hbase shell
+                        hbase(main):001:0&gt;</p>
+                    <p>查看hadoop是否正常加入,进入hadoop安装目录</p>
+                    <pre><code>zhaofeng@zhaofeng-pc:/opt/hadoop-2.8.1$ bin/hadoop fs -ls /hbase
+Found 9 items
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/.tmp
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/MasterProcWALs
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/WALs
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 15:51 /hbase/archive
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 15:37 /hbase/corrupt
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 14:25 /hbase/data
+-rw-r--r--   3 zhaofeng supergroup         42 2017-08-29 14:25 /hbase/hbase.id
+-rw-r--r--   3 zhaofeng supergroup          7 2017-08-29 14:25 /hbase/hbase.version
+drwxr-xr-x   - zhaofeng supergroup          0 2017-08-29 16:47 /hbase/oldWALs
+</code></pre>
+                    <h3 id="43-再次测试nutch"><a href="#43-再次测试nutch" name="43-再次测试nutch">4.3 再次测试nutch</a></h3>
+                    <p>在<code>runtime/</code>创建一个文件<code>urls/seed.txt</code>,并在里面填写需要爬取文件内容.</p>
+                    <pre><code>http://nutch.apache.org/
+</code></pre>
+                    <p>注册urls</p>
+                    <pre><code>bin/nutch inject urls
+bin/nutch readdb -url http://nutch.apache.org/ -text
+</code></pre>
+                    <h2 id="5-apache-solr"><a href="#5-apache-solr" name="5-apache-solr">5 Apache Solr</a></h2>
+                    <p>为了方便对数据进行分析,使用solr来分析获取的数据</p>
+                    <h3 id="51-集成nutch和solr"><a href="#51-集成nutch和solr" name="51-集成nutch和solr">5.1 集成nutch和solr</a></h3>
+                    <p>下载并进入进入solr 6.6.0 安装目录</p>
+                    <h4 id="511-创建一个nutch-配置文件"><a href="#511-创建一个nutch-配置文件" name="511-创建一个nutch-配置文件">5.1.1 创建一个nutch 配置文件</a></h4>
+                    <pre><code>cp -r server/solr/configsets/basic_configs server/solr/configsets/nutch
+</code></pre>
+                    <h4 id="512-把nutch安装目录中的confschemaxml复制到solr下的serversolrconfigsetsnutchconf"><a href="#512-把nutch安装目录中的confschemaxml复制到solr下的serversolrconfigsetsnutchconf" name="512-把nutch安装目录中的confschemaxml复制到solr下的serversolrconfigsetsnutchconf">5.1.2 把nutch安装目录中的<code>conf/schema.xml</code>复制到solr下的<code>server/solr/configsets/nutch/conf</code></a></h4>
+                    <p>并注释掉不支持参数</p>
+                    <pre><code>&lt;!--
+&lt;defaultSearchField&gt;text&lt;/defaultSearchField&gt;
+&lt;solrQueryParser defaultOperator=&quot;OR&quot;/&gt;
+--&gt;
+</code></pre>
+                    <p>全文删除参数<code>enablePositionIncrements=&quot;true&quot;</code></p>
+                    <h4 id="513-删掉文件-serversolrconfigsetsnutchconfmanaged-schema"><a href="#513-删掉文件-serversolrconfigsetsnutchconfmanaged-schema" name="513-删掉文件-serversolrconfigsetsnutchconfmanaged-schema">5.1.3 删掉文件 <code>server/solr/configsets/nutch/conf/managed-schema</code></a></h4>
+                    <pre><code>rm server/solr/configsets/nutch/conf/managed-schema
+</code></pre>
+                    <h4 id="514-注释掉文件serversolrconfigsetsnutchconfsolrconfigxml"><a href="#514-注释掉文件serversolrconfigsetsnutchconfsolrconfigxml" name="514-注释掉文件serversolrconfigsetsnutchconfsolrconfigxml">5.1.4 注释掉文件<code>server/solr/configsets/nutch/conf/solrconfig.xml</code></a></h4>
+                    <pre><code>&lt;!--
+&lt;processor class=&quot;solr.AddSchemaFieldsUpdateProcessorFactory&quot;&gt;
+  &lt;str name=&quot;defaultFieldType&quot;&gt;strings&lt;/str&gt;
+  &lt;lst name=&quot;typeMapping&quot;&gt;
+    &lt;str name=&quot;valueClass&quot;&gt;java.lang.Boolean&lt;/str&gt;
+    &lt;str name=&quot;fieldType&quot;&gt;booleans&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name=&quot;typeMapping&quot;&gt;
+    &lt;str name=&quot;valueClass&quot;&gt;java.util.Date&lt;/str&gt;
+    &lt;str name=&quot;fieldType&quot;&gt;tdates&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name=&quot;typeMapping&quot;&gt;
+    &lt;str name=&quot;valueClass&quot;&gt;java.lang.Long&lt;/str&gt;
+    &lt;str name=&quot;valueClass&quot;&gt;java.lang.Integer&lt;/str&gt;
+    &lt;str name=&quot;fieldType&quot;&gt;tlongs&lt;/str&gt;
+  &lt;/lst&gt;
+  &lt;lst name=&quot;typeMapping&quot;&gt;
+    &lt;str name=&quot;valueClass&quot;&gt;java.lang.Number&lt;/str&gt;
+    &lt;str name=&quot;fieldType&quot;&gt;tdoubles&lt;/str&gt;
+  &lt;/lst&gt;
+&lt;/processor&gt;
+--&gt;
+</code></pre>
+                    <p>回到安装目录启动solr,并创建nutch</p>
+                    <pre><code>bin/solr start
+bin/solr create_core  -c nutch -d server/solr/configsets/nutch/conf
+</code></pre>
+                    <p>查看页面 <a href="http://localhost:8983/solr/#/nutch">http://localhost:8983/solr/#/nutch</a></p>
+                    <p>为了方便学习我做了一个简单的<a href="https://hub.docker.com/r/fansin/solr/">solr for nutch 镜像</a>,使用下面命令快速创建一个hbase单机容器.</p>
+                    <pre><code> docker run --name nutch-solr -itd fansin/solr:nutch
+</code></pre>
+                    <p>不要忘记开启nutch的solr插件功能,修改nutch的<code>runtime/conf/nutch-site.xml</code></p>
+                    <pre><code>&lt;property&gt;
+  &lt;name&gt;plugin.includes&lt;/name&gt;
+  &lt;value&gt;protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor)|indexer-solr|scoring-opic|urlnormalizer-(pass|regex|basic)&lt;/value&gt;
+&lt;/property&gt;
+
+ &lt;property&gt;
+   &lt;name&gt;plugin.folders&lt;/name&gt;
+   &lt;value&gt;plugins&lt;/value&gt;
+ &lt;/property&gt;
+</code></pre>
+                    <h2 id="52-使用nutch-craw命令爬取数据"><a href="#52-使用nutch-craw命令爬取数据" name="52-使用nutch-craw命令爬取数据">5.2 使用nutch craw命令爬取数据</a></h2>
+                    <p>在<code>runtime/</code>创建一个文件<code>urls/seed.txt</code>,并在里面填写需要爬取文件内容.</p>
+                    <pre><code>http://nutch.apache.org/
+</code></pre>
+                    <p>爬取数据格式</p>
+                    <pre><code>crawl 格式:
+
+    Usage: crawl &lt;seedDir&gt; &lt;crawlID&gt; [&lt;solrUrl&gt;] &lt;numberOfRounds&gt;
+</code></pre>
+                    <p>开始爬取数据</p>
+                    <pre><code>bin/crawl urls test http://localhost:8983/solr/nutch 1
+</code></pre>
+                    <p>如果有错误,查看日志,定位问题.
+                        正常情况下,就可以在solr界面看到我们这次爬取的数据.</p>
+                    <p>简析crawl过程,根据日志可以看到几个部分</p>
+                    <ol>
+                        <li class="p">
+                            <p class="p">注入种子urls</p>
+                            <p>Injecting seed URLs
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch inject urls -crawlId test</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">产生mapreduce任务</p>
+                            <p>Generating batchId
+                                Generating a new fetchlist
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch generate -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true -topN 50000 -noNorm -noFilter -adddays 0 -crawlId test -batchId 1504146902-24203</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">抽取任务</p>
+                            <p>Fetching :
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch fetch -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true -D fetcher.timelimit.mins=180 1504146902-24203 -crawlId test -threads 50
+                                ...
+                                Using queue mode : byHost
+                                Fetcher: threads: 50
+                                QueueFeeder finished: total 1 records. Hit by time limit :0</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">解析数据</p>
+                            <p>Parsing :
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch parse -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true -D mapred.skip.attempts.to.start.skipping=2 -D mapred.skip.map.max.skip.records=1 1504146902-24203 -crawlId test</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">写库</p>
+                            <p>CrawlDB update for test
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch updatedb -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true 1504146902-24203 -crawlId test</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">创建solr索引</p>
+                            <p>Indexing test on SOLR index -&gt; <a href="http://localhost:8983/solr/nutch">http://localhost:8983/solr/nutch</a>
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch index -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true -D solr.server.url=<a href="http://localhost:8983/solr/nutch">http://localhost:8983/solr/nutch</a> -all -crawlId test
+                                IndexingJob: starting
+                                Active IndexWriters :
+                                SOLRIndexWriter
+                                solr.server.url : URL of the SOLR instance (mandatory)
+                                solr.commit.size : buffer size when sending to SOLR (default 1000)
+                                solr.mapping.file : name of the mapping file for fields (default solrindex-mapping.xml)
+                                solr.auth : use authentication (default false)
+                                solr.auth.username : username for authentication
+                                solr.auth.password : password for authentication</p>
+                            <p>IndexingJob: done.</p>
+                        </li>
+                        <li class="p">
+                            <p class="p">solr去重</p>
+                            <p>SOLR dedup -&gt; <a href="http://localhost:8983/solr/nutch">http://localhost:8983/solr/nutch</a>
+                                /opt/apache-nutch-2.3.1/runtime/local/bin/nutch solrdedup -D mapred.reduce.tasks=2 -D mapred.child.java.opts=-Xmx1000m -D mapred.reduce.tasks.speculative.execution=false -D mapred.map.tasks.speculative.execution=false -D mapred.compress.map.output=true <a href="http://localhost:8983/solr/nutch">http://localhost:8983/solr/nutch</a></p>
+                        </li>
+                    </ol>
+                    <p>为了方便学习我做了一个简单的<a href="https://hub.docker.com/r/fansin/nutch2/">nutch镜像</a>,使用下面命令快速创建一个hbase单机容器.</p>
+                    <pre><code> docker run -it --link nutch-solr:solr -v /home/zhaofeng/seed.txt:/apache-nutch-2.3.1/urls/seed.txt  fansin/nutch2
+</code></pre>
+                    <p><a href="不推荐">不推荐</a></p>
+                    <p>参考 nutch api,发现了 nutchserver 和 webapp 进行爬数据</p>
+                    <pre><code>bin/nutch nutchserver
+bin/nutch webapp
+</code></pre>
+                    <p><code>但是仍然感觉是个半成品,还没有做好</code></p>
+                    <p>server 默认端口为8081,webapp 默认地址: <a href="http://localhost:8080">http://localhost:8080</a>
+                        打开web UI,新建一个instance,端口已启动的一致.</p>
+                    <p>新建实例</p>
+                    <p><img src="file:///home/zhaofeng/Git/bootstrap/fansinzhao-blog/page/image/nutch-webapp-1.png" alt="" /></p>
+                    <p>新建seed urls</p>
+                    <p><img src="file:///home/zhaofeng/Git/bootstrap/fansinzhao-blog/page/image/nutch-webapp-2.png" alt="" /></p>
+                    <p>爬取seed</p>
+                    <p><img src="file:///home/zhaofeng/Git/bootstrap/fansinzhao-blog/page/image/nutch-webapp-3.png" alt="" /></p>
+                </div>
+                </div>
+
+            </div>
+
+
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div markdown-view > </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        </div>
+    </div>
+</article>
+
+<hr>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="thumbnail text-center">
+                    <img data-src="holder.js/300x300" alt="300x300" style="height: 150px; width: 150px; display: block;" src="image/weixin.png" data-holder-rendered="true">
+                    <div class="caption">
+                        <p>↑↑扫这个的都是天才↑↑</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <ul class="list-inline text-center">
+                    <li>
+                        <a href="https://github.com/FansinZhao">
+                                <span class="fa-stack fa-lg">
+                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                    <i class="fa fa-github fa-stack-1x fa-inverse"></i>
+                                </span>
+                        </a>
+                    </li>
+                </ul>
+                <p class="copyright text-muted">Copyright &copy; Your Website 2016</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- jQuery -->
+<script src="../vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="../vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!--markdown-->
+<script src="../vendor/markdown/markdown.min.js"></script>
+<script src="../vendor/markdown/jquery-markdown.js"></script>
+
+<!-- Contact Form JavaScript -->
+<script src="../js/jqBootstrapValidation.js"></script>
+<script src="../js/contact_me.js"></script>
+
+<!-- Theme JavaScript -->
+<script src="../js/clean-blog.min.js"></script>
+</body>
+
+</html>

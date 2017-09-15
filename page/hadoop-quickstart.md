@@ -69,6 +69,10 @@ hadoop 2.8.1 , jdk8+
     cat output/*
 
 
+为了方便学习我做了一个简单的[hadoop镜像](https://hub.docker.com/r/fansin/hadoop/),使用下面命令快速创建一个hadoop单机容器.
+
+    docker run --name my-hadoop -itd fansin/hadoop
+
 
 ## YARN 集群资源管理
 

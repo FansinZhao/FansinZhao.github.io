@@ -96,7 +96,7 @@ hbase提供了ui界面http://localhost:16010
 
 # 使用Hadoop
 为了防止hbase的数据丢失,一般都是要跟hadoop结合使用.
-关于hadoop的创建,请看我相关的[Hadoop 快速创建]()
+关于hadoop的创建,请看我相关的[Hadoop 快速创建](https://fansinzhao.github.io/page/linux-hadoop-quickstart.html)
 
 现在假设我们已经按照另一篇文章创建了hadoop.默认暴露的端口是9900
 修改配置文件`conf/hbase-site.xml`(默认为空),添加以下内容
@@ -139,6 +139,11 @@ hbase提供了ui界面http://localhost:16010
     1618 org.apache.hadoop.hbase.regionserver.HRegionServer
     1448 org.apache.hadoop.hbase.zookeeper.HQuorumPeer
     1515 org.apache.hadoop.hbase.master.HMaster
+
+为了方便学习我做了一个简单的[hbase镜像](https://hub.docker.com/r/fansin/hbase/),使用下面命令快速创建一个hbase单机容器.
+
+    docker run --name my-hbase-nutch -itd fansin/hbase:0.98.8
+
 
 Hbase 还提供了简单的master和region备份脚本
 
