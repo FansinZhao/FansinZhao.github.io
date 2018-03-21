@@ -215,7 +215,7 @@
                 </div>
                 <hr>
                 <div class="post-preview">
-                    <a href="page/linux-rabbitmq-product.html">
+                    <a href="page/linux-rabbitmq-federation-shovel.html">
                         <h2 class="post-title">
                             <span class="label label-success">消息中间件</span>RabbitMQ生产上线前准备:
                         </h2>
